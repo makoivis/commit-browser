@@ -14,6 +14,7 @@ public class Commit {
     private Date timestamp;
     private String message;
     private String id;
+    private String fullMessage;
 
     public String getEmail() {
         return email;
@@ -55,5 +56,13 @@ public class Commit {
         this.id = id;
     }
 
+	public void setFullMessage(String fullMessage) {
+		this.fullMessage = fullMessage;		
+	}
+
+	public String getFullMessage(){
+		return fullMessage;
+	}
+	
     
 }

@@ -49,6 +49,7 @@ public class GitRepositoryService {
                 commit.setEmail(log1.getAuthorIdent().getEmailAddress());
                 commit.setId(log1.getName());
                 commit.setMessage(log1.getShortMessage());
+                commit.setFullMessage(log1.getFullMessage());
                 commit.setTimestamp(log1.getAuthorIdent().getWhen());
                 commits.add(commit);
             }
