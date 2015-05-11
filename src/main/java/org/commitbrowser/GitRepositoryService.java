@@ -1,10 +1,5 @@
 package org.commitbrowser;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +14,11 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.deltaspike.core.api.config.ConfigProperty;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 /**
  *
@@ -29,7 +28,7 @@ import org.eclipse.jgit.lib.Repository;
 public class GitRepositoryService {
 
     private final ArrayList<Commit> commits = new ArrayList<>(20000);
-    
+
     @Inject
     @ConfigProperty(name = "vaadin.gitdir")
     private String repo;
@@ -39,12 +38,10 @@ public class GitRepositoryService {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         try {
             Repository repository = builder.setGitDir(new File(repo + "/.git"))
-                    .readEnvironment() 
-                    .findGitDir()
-                    .build();
-            
+                    .readEnvironment().findGitDir().build();
+
             Git git = new Git(repository);
-            
+
             Iterable<RevCommit> log = git.log().call();
             for (RevCommit log1 : log) {
                 final Commit commit = new Commit();
@@ -59,11 +56,11 @@ public class GitRepositoryService {
                 commits.add(commit);
             }
         } catch (IOException ex) {
-            Logger.getLogger(GitRepositoryService.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(GitRepositoryService.class.getName()).log(
+                    Level.SEVERE, null, ex);
         } catch (GitAPIException ex) {
-            Logger.getLogger(GitRepositoryService.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            Logger.getLogger(GitRepositoryService.class.getName()).log(
+                    Level.SEVERE, null, ex);
         }
     }
 

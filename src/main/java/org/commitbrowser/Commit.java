@@ -1,4 +1,3 @@
-
 package org.commitbrowser;
 
 import java.util.Date;
@@ -8,7 +7,7 @@ import java.util.Date;
  * @author Matti Tahvonen
  */
 public class Commit {
-    
+
     private String committer;
     private String email;
     private Date timestamp;
@@ -16,9 +15,8 @@ public class Commit {
     private String message;
     private String id;
     private String fullMessage;
-    private double	size;
-    
-    
+    private double size;
+
     public String getEmail() {
         return email;
     }
@@ -26,7 +24,7 @@ public class Commit {
     public void setEmail(String email) {
         this.email = email;
     }
-    
+
     public String getCommitter() {
         return committer;
     }
@@ -59,29 +57,29 @@ public class Commit {
         this.id = id;
     }
 
-	public void setFullMessage(String fullMessage) {
-		this.fullMessage = fullMessage;		
-	}
+    public void setFullMessage(String fullMessage) {
+        this.fullMessage = fullMessage;
+    }
 
-	public String getFullMessage(){
-		return fullMessage;
-	}
+    public String getFullMessage() {
+        return fullMessage;
+    }
 
-	public double getSize() {
-		return size;
-	}
+    public double getSize() {
+        return size;
+    }
 
-	public void setSize(int size) {
-		this.size = size/1024.0; //divide by 1k to get a reasonable progress bar value.
-	}
+    public void setSize(int size) {
+        this.size = size / 1024.0; // divide by 1k to get a reasonable progress
+                                   // bar value.
+    }
 
-	public Date getCommitTime() {
-		return commitTime;
-	}
+    public Date getCommitTime() {
+        return commitTime;
+    }
 
-	public void setCommitTime(Date commitTime) {
-		this.commitTime = commitTime;
-	}
-	
-    
+    public void setCommitTime(Date commitTime) {
+        this.commitTime = commitTime;
+    }
+
 }
