@@ -6,9 +6,11 @@ import javax.inject.Inject;
 
 import org.vaadin.viritin.LazyList;
 
+
 //import com.vaadin.ui.Grid.DetailsGenerator;
 import com.vaadin.annotations.Theme;
 import com.vaadin.cdi.CDIUI;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Component;
@@ -49,8 +51,8 @@ public class MyUI extends UI {
                         LazyList.DEFAULT_PAGE_SIZE),
                 gitRepositoryService::count);
         // IndexedContainer container = new IndexedContainer(lazyList);
-        FilterableListContainer container = new FilterableListContainer<Commit>(
-                lazyList);
+        BeanItemContainer<Commit> container = new BeanItemContainer<Commit>(lazyList); 
+        		
         grid.setContainerDataSource(container);
 
         List<Column> columns = grid.getColumns();
@@ -59,22 +61,21 @@ public class MyUI extends UI {
         for (Column c : columns) {
             System.out.println("c.getPropertyId() = " + c.getPropertyId());
         }
+        
+        // Allow column hiding for all columns
+        grid.getColumns().forEach(column -> column.setHidable(true));
 
         // render size as progressbar
-        columns.get(1).setRenderer(new ProgressBarRenderer());
+        grid.getColumn("size").setRenderer(new ProgressBarRenderer());
 
         // remove commit time
-        grid.removeColumn(columns.get(2).getPropertyId());
+        grid.removeColumn("commitTime");
 
         // remove full message
-        grid.removeColumn(columns.get(3).getPropertyId());
+        grid.removeColumn("fullMessage");
 
         // Allow column reordering
         grid.setColumnReorderingAllowed(true);
-
-        // Allow column hiding for all columns
-        // FIXME: breaks the grid
-        // grid.getColumns().forEach(column -> column.setHidable(true));
 
         // Create a header row to hold column filters
         HeaderRow filterRow = grid.appendHeaderRow();
