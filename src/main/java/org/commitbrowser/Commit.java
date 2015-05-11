@@ -12,10 +12,11 @@ public class Commit {
     private String committer;
     private String email;
     private Date timestamp;
+    private Date commitTime;
     private String message;
     private String id;
     private String fullMessage;
-    private int	size;
+    private double	size;
     
     
     public String getEmail() {
@@ -66,12 +67,20 @@ public class Commit {
 		return fullMessage;
 	}
 
-	public int getSize() {
+	public double getSize() {
 		return size;
 	}
 
 	public void setSize(int size) {
-		this.size = size;
+		this.size = size/1024.0; //divide by 1k to get a reasonable progress bar value.
+	}
+
+	public Date getCommitTime() {
+		return commitTime;
+	}
+
+	public void setCommitTime(Date commitTime) {
+		this.commitTime = commitTime;
 	}
 	
     

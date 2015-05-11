@@ -9,12 +9,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
 import org.apache.deltaspike.core.api.config.ConfigProperty;
 import org.eclipse.jgit.lib.Repository;
 
@@ -52,6 +55,7 @@ public class GitRepositoryService {
                 commit.setFullMessage(log1.getFullMessage());
                 commit.setTimestamp(log1.getAuthorIdent().getWhen());
                 commit.setSize(log1.getRawBuffer().length);
+                commit.setCommitTime(new Date(log1.getCommitTime()));
                 commits.add(commit);
             }
         } catch (IOException ex) {
