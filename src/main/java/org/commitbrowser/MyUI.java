@@ -69,6 +69,13 @@ public class MyUI extends UI {
         // remove full message
         grid.removeColumn(columns.get(3).getPropertyId());
 
+        // Allow column reordering
+        grid.setColumnReorderingAllowed(true);
+
+        // Allow column hiding for all columns
+        // FIXME: breaks the grid
+        // grid.getColumns().forEach(column -> column.setHidable(true));
+
         // Create a header row to hold column filters
         HeaderRow filterRow = grid.appendHeaderRow();
 
