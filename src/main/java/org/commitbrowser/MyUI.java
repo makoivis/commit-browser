@@ -62,15 +62,19 @@ public class MyUI extends UI {
                         LazyList.DEFAULT_PAGE_SIZE), gitRepositoryService::count);
         grid.setContainerDataSource(new ListContainer(lazyList));
         List<Column> columns = grid.getColumns();
+        
+        //print out column names for debugging purposes
         for(Column c : columns){
         	System.out.println("c.getPropertyId() = "+c.getPropertyId());
         }
-        System.out.println(columns.get(1).getPropertyId());
         
+        //remove size
+        grid.removeColumn(columns.get(1).getPropertyId());
+        //remove full message
         grid.removeColumn(columns.get(1).getPropertyId());
         
         grid.setSizeFull();
-        grid.setWidth("1400px");
+        //grid.setWidth("1400px");
 
         layout.addComponent(grid);
         layout.addComponent(fullMessage);
