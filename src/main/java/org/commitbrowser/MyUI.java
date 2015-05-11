@@ -1,18 +1,21 @@
 package org.commitbrowser;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.vaadin.viritin.LazyList;
 
-
 //import com.vaadin.ui.Grid.DetailsGenerator;
 import com.vaadin.annotations.Theme;
 import com.vaadin.cdi.CDIUI;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
@@ -22,7 +25,7 @@ import com.vaadin.ui.Grid.DetailsGenerator;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.Grid.RowReference;
-import com.vaadin.ui.Layout;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -41,18 +44,38 @@ public class MyUI extends UI {
     private TextField numberTextField;
     private Grid grid = new Grid();
 
+    private static LinkedHashMap<String, String> themeVariants = new LinkedHashMap<String, String>();
+    static {
+        themeVariants.put("tests-valo", "Default");
+        themeVariants.put("tests-valo-blueprint", "Blueprint");
+        themeVariants.put("tests-valo-dark", "Dark");
+        themeVariants.put("tests-valo-facebook", "Facebook");
+        themeVariants.put("tests-valo-flatdark", "Flat dark");
+        themeVariants.put("tests-valo-flat", "Flat");
+        themeVariants.put("tests-valo-light", "Light");
+        themeVariants.put("tests-valo-metro", "Metro");
+    }
+
     @Override
     protected void init(VaadinRequest vaadinRequest) {
 
-        Layout layout = new VerticalLayout();
+        VerticalLayout layout = new VerticalLayout();
+        layout.setMargin(true);
+        layout.setSpacing(true);
+
+        // Add theme selector
+        Component themeSelector = buildThemeSelector();
+        layout.addComponent(themeSelector);
+        layout.setComponentAlignment(themeSelector, Alignment.TOP_RIGHT);
 
         LazyList<Commit> lazyList = new LazyList<>(
                 firstRow -> gitRepositoryService.find(firstRow,
                         LazyList.DEFAULT_PAGE_SIZE),
                 gitRepositoryService::count);
         // IndexedContainer container = new IndexedContainer(lazyList);
-        BeanItemContainer<Commit> container = new BeanItemContainer<Commit>(lazyList); 
-        		
+        BeanItemContainer<Commit> container = new BeanItemContainer<Commit>(
+                lazyList);
+
         grid.setContainerDataSource(container);
 
         List<Column> columns = grid.getColumns();
@@ -61,7 +84,7 @@ public class MyUI extends UI {
         for (Column c : columns) {
             System.out.println("c.getPropertyId() = " + c.getPropertyId());
         }
-        
+
         // Allow column hiding for all columns
         grid.getColumns().forEach(column -> column.setHidable(true));
 
@@ -115,6 +138,7 @@ public class MyUI extends UI {
         grid.setSizeFull();
 
         layout.addComponent(grid);
+        layout.setExpandRatio(grid, 1);
 
         grid.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 
@@ -130,6 +154,27 @@ public class MyUI extends UI {
 
         setContent(layout);
 
+    }
+
+    private Component buildThemeSelector() {
+        final NativeSelect ns = new NativeSelect();
+        ns.setNullSelectionAllowed(false);
+        ns.setId("themeSelect");
+        ns.addContainerProperty("caption", String.class, "");
+        ns.setItemCaptionPropertyId("caption");
+        for (final String identifier : themeVariants.keySet()) {
+            ns.addItem(identifier).getItemProperty("caption")
+                    .setValue(themeVariants.get(identifier));
+        }
+
+        ns.setValue("tests-valo");
+        ns.addValueChangeListener(new ValueChangeListener() {
+            @Override
+            public void valueChange(final ValueChangeEvent event) {
+                setTheme((String) ns.getValue());
+            }
+        });
+        return ns;
     }
 
     private final DetailsGenerator detailsGenerator = new DetailsGenerator() {
@@ -171,4 +216,5 @@ public class MyUI extends UI {
         Object itemId = grid.getContainerDataSource().getIdByIndex(row);
         return itemId;
     }
+
 }
