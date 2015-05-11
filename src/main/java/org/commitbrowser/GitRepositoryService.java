@@ -51,6 +51,7 @@ public class GitRepositoryService {
                 commit.setMessage(log1.getShortMessage());
                 commit.setFullMessage(log1.getFullMessage());
                 commit.setTimestamp(log1.getAuthorIdent().getWhen());
+                commit.setSize(log1.getRawBuffer().length);
                 commits.add(commit);
             }
         } catch (IOException ex) {

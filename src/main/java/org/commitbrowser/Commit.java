@@ -15,7 +15,9 @@ public class Commit {
     private String message;
     private String id;
     private String fullMessage;
-
+    private int	size;
+    
+    
     public String getEmail() {
         return email;
     }
@@ -62,6 +64,14 @@ public class Commit {
 
 	public String getFullMessage(){
 		return fullMessage;
+	}
+
+	public int getSize() {
+		return size;
+	}
+
+	public void setSize(int size) {
+		this.size = size;
 	}
 	
     
