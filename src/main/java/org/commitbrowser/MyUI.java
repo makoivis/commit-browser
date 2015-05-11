@@ -11,6 +11,10 @@ import javax.servlet.annotation.WebServlet;
 
 
 
+
+
+
+
 //import com.vaadin.ui.Grid.DetailsGenerator;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -26,6 +30,8 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Grid.DetailsGenerator;
+import com.vaadin.ui.Grid.HeaderCell;
+import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.Grid.RowReference;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -35,9 +41,12 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.ProgressBarRenderer;
+import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.data.util.filter.SimpleStringFilter;
 
 import javax.inject.Inject;
 
@@ -66,7 +75,10 @@ public class MyUI extends UI {
         LazyList<Commit> lazyList = new LazyList<>(
                 firstRow -> gitRepositoryService.find(firstRow,
                         LazyList.DEFAULT_PAGE_SIZE), gitRepositoryService::count);
-        grid.setContainerDataSource(new ListContainer(lazyList));
+        //IndexedContainer container = new IndexedContainer(lazyList);
+        FilterableListContainer container = new FilterableListContainer<Commit>(lazyList);
+        grid.setContainerDataSource(container);
+        
         List<Column> columns = grid.getColumns();
         
         //print out column names for debugging purposes
@@ -84,6 +96,40 @@ public class MyUI extends UI {
         
         //remove full message
         grid.removeColumn(columns.get(3).getPropertyId());
+        
+        // Create a header row to hold column filters
+        HeaderRow filterRow = grid.appendHeaderRow();
+     
+        
+        // Set up a filter for all columns
+        for (Object pid: grid.getContainerDataSource()
+                             .getContainerPropertyIds()) {
+            HeaderCell cell = filterRow.getCell(pid);
+            if (cell == null){
+            	continue;
+            }
+            
+            // Have an input field to use for filter
+            TextField filterField = new TextField();
+            filterField.setColumns(8);
+            
+            // Update filter When the filter input is changed
+            filterField.addTextChangeListener(change -> {
+                // Can't modify filters so need to replace
+            	System.err.println("Got text change event");
+                container.removeContainerFilters(pid);
+                
+                boolean ignoreCase = true;
+                boolean onlyMatchPrefix = false;
+                
+                // (Re)create the filter if necessary
+                if (! change.getText().isEmpty()){
+                	System.err.println("Adding filter");
+                    container.addContainerFilter(pid, change.getText(), ignoreCase, onlyMatchPrefix);
+                }
+            });
+            cell.setComponent(filterField);
+        }
         
         layout.setSizeFull();
         grid.setSizeFull();
