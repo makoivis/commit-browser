@@ -31,6 +31,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.ProgressBarRenderer;
+import com.vaadin.ui.themes.ValoTheme;
 
 /**
  *
@@ -114,6 +115,7 @@ public class MyUI extends UI {
             // Have an input field to use for filter
             TextField filterField = new TextField();
             filterField.setColumns(8);
+            filterField.addStyleName(ValoTheme.TEXTFIELD_SMALL);
 
             // Update filter When the filter input is changed
             filterField.addTextChangeListener(change -> {
