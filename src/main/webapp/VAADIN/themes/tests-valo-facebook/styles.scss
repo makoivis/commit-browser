@@ -3,4 +3,9 @@
 
 .tests-valo-facebook {
    @include valotest;
+   
+  .v-grid-cell > input,
+  .v-grid-cell > .v-horizontallayout {
+    margin-top: -2px;
+  }
 }

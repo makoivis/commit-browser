@@ -1,4 +1,6 @@
 @mixin valotest {
+  $v-grid-header-row-height: 42px;
+
   @include valo;
 
   #themeSelect {
@@ -149,5 +151,10 @@
   .content-common,
   .content-labels {
   	max-width: 800px;
+  }
+  
+  .v-grid-cell > input,
+  .v-grid-cell > .v-horizontallayout {
+    margin-top: -3px;
   }
 }

@@ -8,7 +8,6 @@ import javax.inject.Inject;
 
 import org.vaadin.viritin.LazyList;
 
-
 //import com.vaadin.ui.Grid.DetailsGenerator;
 import com.vaadin.annotations.Theme;
 import com.vaadin.cdi.CDIUI;
@@ -28,6 +27,7 @@ import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.Grid.RowReference;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
@@ -39,233 +39,241 @@ import com.vaadin.ui.themes.ValoTheme;
 /**
  *
  */
-@Theme("valo")
+@Theme("tests-valo")
 @CDIUI("")
 public class MyUI extends UI {
 
-	@Inject
-	GitRepositoryService gitRepositoryService;
-	private TextField numberTextField;
-	private Grid grid = new Grid();
+    @Inject
+    GitRepositoryService gitRepositoryService;
+    private Grid grid = new Grid();
 
-	private static LinkedHashMap<String, String> themeVariants = new LinkedHashMap<String, String>();
-	static {
-		themeVariants.put("tests-valo", "Default");
-		themeVariants.put("tests-valo-blueprint", "Blueprint");
-		themeVariants.put("tests-valo-dark", "Dark");
-		themeVariants.put("tests-valo-facebook", "Facebook");
-		themeVariants.put("tests-valo-flatdark", "Flat dark");
-		themeVariants.put("tests-valo-flat", "Flat");
-		themeVariants.put("tests-valo-light", "Light");
-		themeVariants.put("tests-valo-metro", "Metro");
-	}
+    private static LinkedHashMap<String, String> themeVariants = new LinkedHashMap<String, String>();
+    static {
+        themeVariants.put("tests-valo", "Default");
+        themeVariants.put("tests-valo-blueprint", "Blueprint");
+        themeVariants.put("tests-valo-dark", "Dark");
+        themeVariants.put("tests-valo-facebook", "Facebook");
+        themeVariants.put("tests-valo-flatdark", "Flat dark");
+        themeVariants.put("tests-valo-flat", "Flat");
+        themeVariants.put("tests-valo-light", "Light");
+        themeVariants.put("tests-valo-metro", "Metro");
+    }
 
-	@Override
-	protected void init(VaadinRequest vaadinRequest) {
+    @Override
+    protected void init(VaadinRequest vaadinRequest) {
 
-		VerticalLayout layout = new VerticalLayout();
-		layout.setMargin(true);
-		layout.setSpacing(true);
+        VerticalLayout layout = new VerticalLayout();
+        layout.setMargin(true);
+        layout.setSpacing(true);
 
-		// Add theme selector
-		Component themeSelector = buildThemeSelector();
-		layout.addComponent(themeSelector);
-		layout.setComponentAlignment(themeSelector, Alignment.TOP_RIGHT);
+        // Add theme selector
+        Component themeSelector = buildThemeSelector();
+        layout.addComponent(themeSelector);
+        layout.setComponentAlignment(themeSelector, Alignment.TOP_RIGHT);
 
-		LazyList<Commit> lazyList = new LazyList<>(
-				firstRow -> gitRepositoryService.find(firstRow,
-						LazyList.DEFAULT_PAGE_SIZE),
-				gitRepositoryService::count);
-		// IndexedContainer container = new IndexedContainer(lazyList);
-		BeanItemContainer<Commit> container = new BeanItemContainer<Commit>(
-				lazyList);
+        LazyList<Commit> lazyList = new LazyList<>(
+                firstRow -> gitRepositoryService.find(firstRow,
+                        LazyList.DEFAULT_PAGE_SIZE),
+                gitRepositoryService::count);
+        // IndexedContainer container = new IndexedContainer(lazyList);
+        BeanItemContainer<Commit> container = new BeanItemContainer<Commit>(
+                Commit.class, lazyList);
 
-		grid.setContainerDataSource(container);
+        grid.setContainerDataSource(container);
 
-		List<Column> columns = grid.getColumns();
+        List<Column> columns = grid.getColumns();
 
-		// print out column names for debugging purposes
-		for (Column c : columns) {
-			System.out.println("c.getPropertyId() = " + c.getPropertyId());
-		}
+        // print out column names for debugging purposes
+        for (Column c : columns) {
+            System.out.println("c.getPropertyId() = " + c.getPropertyId());
+        }
 
-		// Allow column hiding for all columns
-		grid.getColumns().forEach(column -> column.setHidable(true));
+        // Allow column hiding for all columns
+        grid.getColumns().forEach(column -> column.setHidable(true));
 
-		// render size as progressbar
-		grid.getColumn("size").setRenderer(new ProgressBarRenderer());
+        // render size as progressbar
+        grid.getColumn("size").setRenderer(new ProgressBarRenderer());
 
-		// remove commit time
-		grid.removeColumn("commitTime");
+        // remove commit time
+        grid.removeColumn("commitTime");
 
-		// remove full message
-		grid.removeColumn("fullMessage");
+        // remove full message
+        grid.removeColumn("fullMessage");
 
-		// Allow column reordering
-		grid.setColumnReorderingAllowed(true);
+        // Allow column reordering
+        grid.setColumnReorderingAllowed(true);
 
-		// Create a header row to hold column filters
-		HeaderRow filterRow = grid.appendHeaderRow();
+        // Create a header row to hold column filters
+        HeaderRow filterRow = grid.appendHeaderRow();
 
-		// Set up a filter for author, topic, date and email
-		
-		// set up dateFilters
-		startFilter = new DateFilter(null, true);
-		endFilter = new DateFilter(null, false);
+        // Set up a filter for author, topic, date and email
 
-		for (Object pid : grid.getContainerDataSource()
-				.getContainerPropertyIds()) {
+        // set up dateFilters
+        startFilter = new DateFilter(null, true);
+        endFilter = new DateFilter(null, false);
 
-			// if we are not in one of the tree columns, move on
-			if (!(pid.equals("message") || pid.equals("committer")
-					|| pid.equals("email") || pid.equals("timestamp"))) {
-				continue;
-			}
+        for (Object pid : grid.getContainerDataSource()
+                .getContainerPropertyIds()) {
 
-			HeaderCell cell = filterRow.getCell(pid);
+            // if we are not in one of the tree columns, move on
+            if (!(pid.equals("message") || pid.equals("committer")
+                    || pid.equals("email") || pid.equals("timestamp"))) {
+                continue;
+            }
 
-			// if we are dealing with a text field, add a simple string filter.
+            HeaderCell cell = filterRow.getCell(pid);
 
-			if (pid.equals("message") || pid.equals("committer")
-					|| pid.equals("email")) {
+            // if we are dealing with a text field, add a simple string filter.
 
-				// Have an input field to use for filter
-				TextField filterField = new TextField();
-				filterField.setColumns(8);
-				filterField.addStyleName(ValoTheme.TEXTFIELD_SMALL);
+            if (pid.equals("message") || pid.equals("committer")
+                    || pid.equals("email")) {
 
-				// Update filter When the filter input is changed
-				filterField.addTextChangeListener(change -> {
-					// Can't modify filters so need to replace
-						System.err.println("Got text change event");
-						container.removeContainerFilters(pid);
+                // Have an input field to use for filter
+                TextField filterField = new TextField();
+                filterField.setWidth(100, Unit.PERCENTAGE);
+                filterField.addStyleName(ValoTheme.TEXTFIELD_SMALL);
 
-						boolean ignoreCase = true;
-						boolean onlyMatchPrefix = false;
+                // Update filter When the filter input is changed
+                filterField.addTextChangeListener(change -> {
+                    // Can't modify filters so need to replace
+                        System.err.println("Got text change event");
+                        container.removeContainerFilters(pid);
 
-						// (Re)create the filter if necessary
-						if (!change.getText().isEmpty()) {
-							System.err.println("Adding filter");
-							container.addContainerFilter(pid, change.getText(),
-									ignoreCase, onlyMatchPrefix);
-						}
-					});
-				cell.setComponent(filterField);
-			}
+                        boolean ignoreCase = true;
+                        boolean onlyMatchPrefix = false;
 
-			// if we are dealing with a date field, add a date range filter.
-			if (pid.equals("timestamp")) {
-				// we need a start date and an end date
-				HorizontalLayout hl = new HorizontalLayout();
-				DateField startDate = new DateField("From:");
-				DateField endDate = new DateField("To:");
-				hl.addComponent(startDate);
-				hl.addComponent(endDate);
-				
+                        // (Re)create the filter if necessary
+                        if (!change.getText().isEmpty()) {
+                            System.err.println("Adding filter");
+                            container.addContainerFilter(pid, change.getText(),
+                                    ignoreCase, onlyMatchPrefix);
+                        }
+                    });
+                cell.setComponent(filterField);
+            }
 
-				startDate.addValueChangeListener(new ValueChangeListener() {
+            // if we are dealing with a date field, add a date range filter.
+            if (pid.equals("timestamp")) {
+                // we need a start date and an end date
+                HorizontalLayout hl = new HorizontalLayout();
+                hl.setSpacing(true);
 
-					@Override
-					public void valueChange(ValueChangeEvent event) {
-						Date start = (Date) event.getProperty().getValue();
-						// remove filter
-						startFilter = new DateFilter(start, true);
-						container.removeContainerFilters("timestamp");
-						container.addContainerFilter(startFilter);
-						container.addContainerFilter(endFilter);
-					}
-				});
-				
-				endDate.addValueChangeListener(new ValueChangeListener() {
+                DateField startDate = new DateField();
+                DateField endDate = new DateField();
+                startDate.addStyleName(ValoTheme.DATEFIELD_SMALL);
+                endDate.addStyleName(ValoTheme.DATEFIELD_SMALL);
+                startDate.setWidth(120, Unit.PIXELS);
+                endDate.setWidth(120, Unit.PIXELS);
 
-					@Override
-					public void valueChange(ValueChangeEvent event) {
-						Date end = (Date) event.getProperty().getValue();
-						// remove filter
-						endFilter = new DateFilter(end, false);
-						container.removeContainerFilters("timestamp");
-						container.addContainerFilter(startFilter);
-						container.addContainerFilter(endFilter);
-					}
-				});
-				
-				
-				
-				
-				cell.setComponent(hl);
+                Label dash = new Label("-");
+                dash.setSizeUndefined();
 
-			}
+                hl.addComponent(startDate);
+                hl.addComponent(dash);
+                hl.addComponent(endDate);
 
-		}
+                hl.setComponentAlignment(dash, Alignment.MIDDLE_CENTER);
 
-		layout.setSizeFull();
-		grid.setSizeFull();
+                startDate.addValueChangeListener(new ValueChangeListener() {
 
-		layout.addComponent(grid);
-		layout.setExpandRatio(grid, 1);
+                    @Override
+                    public void valueChange(ValueChangeEvent event) {
+                        Date start = (Date) event.getProperty().getValue();
+                        // remove filter
+                        startFilter = new DateFilter(start, true);
+                        container.removeContainerFilters("timestamp");
+                        container.addContainerFilter(startFilter);
+                        container.addContainerFilter(endFilter);
+                    }
+                });
 
-		grid.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+                endDate.addValueChangeListener(new ValueChangeListener() {
 
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				Object itemId = event.getItemId();
-				boolean isVisible = grid.isDetailsVisible(itemId);
-				grid.setDetailsVisible(itemId, !isVisible);
-			}
+                    @Override
+                    public void valueChange(ValueChangeEvent event) {
+                        Date end = (Date) event.getProperty().getValue();
+                        // remove filter
+                        endFilter = new DateFilter(end, false);
+                        container.removeContainerFilters("timestamp");
+                        container.addContainerFilter(startFilter);
+                        container.addContainerFilter(endFilter);
+                    }
+                });
 
-		});
-		grid.setDetailsGenerator(detailsGenerator);
+                cell.setComponent(hl);
 
-		setContent(layout);
+            }
 
-	}
+        }
 
-	private Component buildThemeSelector() {
-		final NativeSelect ns = new NativeSelect();
-		ns.setNullSelectionAllowed(false);
-		ns.setId("themeSelect");
-		ns.addContainerProperty("caption", String.class, "");
-		ns.setItemCaptionPropertyId("caption");
-		for (final String identifier : themeVariants.keySet()) {
-			ns.addItem(identifier).getItemProperty("caption")
-					.setValue(themeVariants.get(identifier));
-		}
+        layout.setSizeFull();
+        grid.setSizeFull();
 
-		ns.setValue("tests-valo");
-		ns.addValueChangeListener(new ValueChangeListener() {
-			@Override
-			public void valueChange(final ValueChangeEvent event) {
-				setTheme((String) ns.getValue());
-			}
-		});
-		return ns;
-	}
+        layout.addComponent(grid);
+        layout.setExpandRatio(grid, 1);
 
-	private final DetailsGenerator detailsGenerator = new DetailsGenerator() {
-		@Override
-		public Component getDetails(RowReference rowReference) {
-			FormLayout layout = new FormLayout();
+        grid.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 
-			Commit commit = (Commit) rowReference.getItemId();
+            @Override
+            public void itemClick(ItemClickEvent event) {
+                Object itemId = event.getItemId();
+                boolean isVisible = grid.isDetailsVisible(itemId);
+                grid.setDetailsVisible(itemId, !isVisible);
+            }
 
-			DateField commitDate = new DateField("Commit Timestamp");
-			commitDate.setValue(commit.getCommitTime());
-			layout.addComponent(commitDate);
+        });
+        grid.setDetailsGenerator(detailsGenerator);
 
-			DateField authorDate = new DateField("Author Timestamp");
-			authorDate.setValue(commit.getTimestamp());
-			layout.addComponent(authorDate);
+        setContent(layout);
 
-			TextArea textArea = new TextArea("Commit Message");
-			textArea.setValue(commit.getFullMessage());
-			textArea.setWidth("100%");
-			layout.addComponent(textArea);
+    }
 
-			return layout;
-		}
-	};
-	private DateFilter startFilter;
-	private DateFilter endFilter;
+    @SuppressWarnings("unchecked")
+    private Component buildThemeSelector() {
+        final NativeSelect ns = new NativeSelect();
+        ns.setNullSelectionAllowed(false);
+        ns.setId("themeSelect");
+        ns.addContainerProperty("caption", String.class, "");
+        ns.setItemCaptionPropertyId("caption");
+        for (final String identifier : themeVariants.keySet()) {
+            ns.addItem(identifier).getItemProperty("caption")
+                    .setValue(themeVariants.get(identifier));
+        }
 
+        ns.setValue("tests-valo");
+        ns.addValueChangeListener(new ValueChangeListener() {
+            @Override
+            public void valueChange(final ValueChangeEvent event) {
+                setTheme((String) ns.getValue());
+            }
+        });
+        return ns;
+    }
+
+    private final DetailsGenerator detailsGenerator = new DetailsGenerator() {
+        @Override
+        public Component getDetails(RowReference rowReference) {
+            FormLayout layout = new FormLayout();
+
+            Commit commit = (Commit) rowReference.getItemId();
+
+            DateField commitDate = new DateField("Commit Timestamp");
+            commitDate.setValue(commit.getCommitTime());
+            layout.addComponent(commitDate);
+
+            DateField authorDate = new DateField("Author Timestamp");
+            authorDate.setValue(commit.getTimestamp());
+            layout.addComponent(authorDate);
+
+            TextArea textArea = new TextArea("Commit Message");
+            textArea.setValue(commit.getFullMessage());
+            textArea.setWidth("100%");
+            layout.addComponent(textArea);
+
+            return layout;
+        }
+    };
+    private DateFilter startFilter;
+    private DateFilter endFilter;
 
 }
