@@ -8,7 +8,6 @@ import javax.inject.Inject;
 
 import org.vaadin.viritin.LazyList;
 
-//import com.vaadin.ui.Grid.DetailsGenerator;
 import com.vaadin.annotations.Theme;
 import com.vaadin.cdi.CDIUI;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -75,7 +74,7 @@ public class MyUI extends UI {
                 firstRow -> gitRepositoryService.find(firstRow,
                         LazyList.DEFAULT_PAGE_SIZE),
                 gitRepositoryService::count);
-        // IndexedContainer container = new IndexedContainer(lazyList);
+
         BeanItemContainer<Commit> container = new BeanItemContainer<Commit>(
                 Commit.class, lazyList);
 
