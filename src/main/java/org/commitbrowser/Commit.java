@@ -16,6 +16,8 @@ public class Commit {
     private String id;
     private String fullMessage;
     private double size;
+    private String fullName;
+    private String fullTopic;
 
     public String getEmail() {
         return email;
@@ -81,5 +83,21 @@ public class Commit {
     public void setCommitTime(Date commitTime) {
         this.commitTime = commitTime;
     }
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+	public String getFullTopic() {
+		return fullTopic;
+	}
+
+	public void setFullTopic(String fullTopic) {
+		this.fullTopic = fullTopic;
+	}
 
 }

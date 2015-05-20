@@ -53,6 +53,8 @@ public class GitRepositoryService {
                 commit.setTimestamp(log1.getAuthorIdent().getWhen());
                 commit.setSize(log1.getRawBuffer().length);
                 commit.setCommitTime(new Date(log1.getCommitTime()));
+                commit.setFullName(commit.getCommitter() + " ("+commit.getEmail()+")");
+                commit.setFullTopic(commit.getId().substring(0, 8)+" "+commit.getMessage());
                 commits.add(commit);
             }
         } catch (IOException ex) {

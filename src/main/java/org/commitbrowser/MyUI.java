@@ -92,18 +92,17 @@ public class MyUI extends UI {
             System.out.println("c.getPropertyId() = " + c.getPropertyId());
         }
 
+        grid.setColumns("fullName","fullTopic","size","timestamp");
+
         // Allow column hiding for all columns
         grid.getColumns().forEach(column -> column.setHidable(true));
 
         // render size as progressbar
         grid.getColumn("size").setRenderer(new ProgressBarRenderer());
 
-        // remove commit time
-        grid.removeColumn("commitTime");
+        
 
-        // remove full message
-        grid.removeColumn("fullMessage");
-
+        
         // Allow column reordering
         grid.setColumnReorderingAllowed(true);
 
@@ -120,8 +119,7 @@ public class MyUI extends UI {
                 .getContainerPropertyIds()) {
 
             // if we are not in one of the tree columns, move on
-            if (!(pid.equals("message") || pid.equals("committer")
-                    || pid.equals("email") || pid.equals("timestamp"))) {
+            if (!(pid.equals("fullName") || pid.equals("fullTopic") || pid.equals("timestamp"))) {
                 continue;
             }
 
@@ -129,8 +127,7 @@ public class MyUI extends UI {
 
             // if we are dealing with a text field, add a simple string filter.
 
-            if (pid.equals("message") || pid.equals("committer")
-                    || pid.equals("email")) {
+            if (pid.equals("fullName") || pid.equals("fullTopic")) {
 
                 // Have an input field to use for filter
                 TextField filterField = new TextField();
@@ -215,6 +212,8 @@ public class MyUI extends UI {
 
         layout.addComponent(grid);
         layout.setExpandRatio(grid, 1);
+        
+        
 
         grid.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 
