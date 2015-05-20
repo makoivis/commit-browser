@@ -3,6 +3,7 @@ package org.commitbrowser;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Stack;
 
 import javax.inject.Inject;
 
@@ -14,6 +15,8 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ShortcutListener;
+import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -45,6 +48,7 @@ public class MyUI extends UI {
     @Inject
     GitRepositoryService gitRepositoryService;
     private Grid grid = new Grid();
+    private Stack<Object> openDetails = new Stack<>();
 
     private static LinkedHashMap<String, String> themeVariants = new LinkedHashMap<String, String>();
     static {
@@ -218,11 +222,28 @@ public class MyUI extends UI {
                 Object itemId = event.getItemId();
                 boolean isVisible = grid.isDetailsVisible(itemId);
                 grid.setDetailsVisible(itemId, !isVisible);
+                if(!isVisible) {
+                    openDetails.push(itemId);
+                } else {
+                    openDetails.remove(itemId);
+                }
             }
 
         });
         grid.setDetailsGenerator(detailsGenerator);
 
+        layout.addShortcutListener(new ShortcutListener("Close details row",
+                KeyCode.ESCAPE, null) {
+            @Override
+            public void handleAction(Object sender, Object target) {
+                try {
+                    Object itemId = openDetails.pop();
+                    grid.setDetailsVisible(itemId, false);
+                } catch(Exception ignore) {
+                }
+            }
+        });
+        
         setContent(layout);
 
     }
