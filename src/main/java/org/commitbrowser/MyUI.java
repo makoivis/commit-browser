@@ -1,5 +1,6 @@
 package org.commitbrowser;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,9 +16,10 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.ShortcutListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
@@ -31,7 +33,6 @@ import com.vaadin.ui.Grid.RowReference;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -222,7 +223,7 @@ public class MyUI extends UI {
                 Object itemId = event.getItemId();
                 boolean isVisible = grid.isDetailsVisible(itemId);
                 grid.setDetailsVisible(itemId, !isVisible);
-                if(!isVisible) {
+                if (!isVisible) {
                     openDetails.push(itemId);
                 } else {
                     openDetails.remove(itemId);
@@ -239,11 +240,11 @@ public class MyUI extends UI {
                 try {
                     Object itemId = openDetails.pop();
                     grid.setDetailsVisible(itemId, false);
-                } catch(Exception ignore) {
+                } catch (Exception ignore) {
                 }
             }
         });
-        
+
         setContent(layout);
 
     }
@@ -274,21 +275,30 @@ public class MyUI extends UI {
         @Override
         public Component getDetails(RowReference rowReference) {
             FormLayout layout = new FormLayout();
+            layout.setMargin(true);
 
             Commit commit = (Commit) rowReference.getItemId();
 
-            DateField commitDate = new DateField("Commit Timestamp");
-            commitDate.setValue(commit.getCommitTime());
+            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
+                    DateFormat.MEDIUM, getLocale());
+
+            Label commitDate = new Label();
+            commitDate.setCaption("Commit Timestamp");
+            commitDate.setValue(df.format(commit.getCommitTime()));
             layout.addComponent(commitDate);
 
-            DateField authorDate = new DateField("Author Timestamp");
-            authorDate.setValue(commit.getTimestamp());
+            Label authorDate = new Label();
+            authorDate.setCaption("Author Timestamp");
+            authorDate.setValue(df.format(commit.getTimestamp()));
+            authorDate.setReadOnly(true);
             layout.addComponent(authorDate);
 
-            TextArea textArea = new TextArea("Commit Message");
-            textArea.setValue(commit.getFullMessage());
-            textArea.setWidth("100%");
-            layout.addComponent(textArea);
+            Label msg = new Label();
+            msg.setCaption("Commit Message");
+            msg.setValue(commit.getFullMessage());
+            msg.setWidth("100%");
+            msg.setContentMode(ContentMode.PREFORMATTED);
+            layout.addComponent(msg);
 
             return layout;
         }
