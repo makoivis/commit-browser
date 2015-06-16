@@ -1,4 +1,4 @@
-package org.commitbrowser;
+package com.vaadin.demo.commitbrowser;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -8,6 +8,8 @@ import java.util.Stack;
 
 import javax.inject.Inject;
 
+import com.vaadin.ui.renderers.HtmlRenderer;
+import elemental.json.JsonValue;
 import org.vaadin.viritin.LazyList;
 
 import com.vaadin.annotations.Theme;
@@ -52,6 +54,14 @@ public class MyUI extends UI {
     private Stack<Object> openDetails = new Stack<>();
 
     private static LinkedHashMap<String, String> themeVariants = new LinkedHashMap<String, String>();
+
+    private static class MinimalSizeHtmlRenderer extends HtmlRenderer {
+        @Override
+        public JsonValue encode(String value) {
+            return super.encode("<div><div style='width:10px;overflow-x:visible'>" +value + "</div></div>");
+        }
+    }
+
     static {
         themeVariants.put("tests-valo", "Default");
         themeVariants.put("tests-valo-blueprint", "Blueprint");
@@ -66,15 +76,18 @@ public class MyUI extends UI {
     @Override
     protected void init(VaadinRequest vaadinRequest) {
 
+        boolean isEmbedded = "embedded".equals(vaadinRequest.getParameter("type"));
         VerticalLayout layout = new VerticalLayout();
-        layout.setMargin(true);
-        layout.setSpacing(true);
+        layout.setId("rootLayout");
+        layout.setMargin(!isEmbedded);
+        layout.setSpacing(!isEmbedded);
 
         // Add theme selector
-        Component themeSelector = buildThemeSelector();
-        layout.addComponent(themeSelector);
-        layout.setComponentAlignment(themeSelector, Alignment.TOP_RIGHT);
-
+        if(!isEmbedded) {
+            Component themeSelector = buildThemeSelector();
+            layout.addComponent(themeSelector);
+            layout.setComponentAlignment(themeSelector, Alignment.TOP_RIGHT);
+        }
         LazyList<Commit> lazyList = new LazyList<>(
                 firstRow -> gitRepositoryService.find(firstRow,
                         LazyList.DEFAULT_PAGE_SIZE),
@@ -94,15 +107,19 @@ public class MyUI extends UI {
 
         grid.setColumns("fullName","fullTopic","size","timestamp");
 
+        grid.getColumn("fullName").setExpandRatio(1);
+        grid.getColumn("fullName").setRenderer(new MinimalSizeHtmlRenderer());
+//        grid.getColumn("fullName").setWidth(185);
+
+        grid.getColumn("fullTopic").setExpandRatio(2);
+        grid.getColumn("fullTopic").setRenderer(new MinimalSizeHtmlRenderer());
+//        grid.getColumn("fullTopic").setWidth(372);
         // Allow column hiding for all columns
         grid.getColumns().forEach(column -> column.setHidable(true));
 
         // render size as progressbar
         grid.getColumn("size").setRenderer(new ProgressBarRenderer());
 
-        
-
-        
         // Allow column reordering
         grid.setColumnReorderingAllowed(true);
 
