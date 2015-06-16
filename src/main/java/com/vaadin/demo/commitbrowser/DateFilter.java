@@ -1,4 +1,4 @@
-package org.commitbrowser;
+package com.vaadin.demo.commitbrowser;
 
 import java.util.Calendar;
 import java.util.Date;
