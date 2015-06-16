@@ -1,4 +1,4 @@
-package org.commitbrowser;
+package com.vaadin.demo.commitbrowser;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +54,10 @@ public class GitRepositoryService {
                 commit.setSize(log1.getRawBuffer().length);
                 commit.setCommitTime(new Date(log1.getCommitTime()));
                 commit.setFullName(commit.getCommitter() + " ("+commit.getEmail()+")");
-                commit.setFullTopic(commit.getId().substring(0, 8)+" "+commit.getMessage());
+                StringBuilder fullTopic = new StringBuilder(commit.getMessage().trim());
+                if(fullTopic.length() == 0 ) fullTopic.append("-- No Message -- ");
+                fullTopic.append(" [").append(commit.getId().substring(0, 8)).append(']');
+                commit.setFullTopic(fullTopic.toString());
                 commits.add(commit);
             }
         } catch (IOException ex) {
