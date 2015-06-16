@@ -1,66 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.vaadin.demo</groupId>
-	<artifactId>commit-browser</artifactId>
-	<packaging>war</packaging>
-	<version>1.0-SNAPSHOT</version>
-	<name>commit-browser</name>
+    <groupId>org.vaadin.demo</groupId>
+    <artifactId>commit-browser</artifactId>
+    <packaging>war</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>commit-browser</name>
 
-	<properties>
-		<vaadin.version>7.5.0.beta1</vaadin.version>
-		<vaadin.plugin.version>7.4.5</vaadin.plugin.version>
-		<jetty.plugin.version>9.2.3.v20140905</jetty.plugin.version>
-		<project.source.version>1.8</project.source.version>
-		<project.target.version>1.8</project.target.version>
-		<project.encoding>UTF-8</project.encoding>
-	</properties>
+    <properties>
+        <vaadin.version>7.5-SNAPSHOT</vaadin.version>
+        <vaadin.plugin.version>7.4.5</vaadin.plugin.version>
+        <jetty.plugin.version>9.2.3.v20140905</jetty.plugin.version>
+        <project.source.version>1.8</project.source.version>
+        <project.target.version>1.8</project.target.version>
+        <project.encoding>UTF-8</project.encoding>
+    </properties>
 
-	<repositories>
-		<repository>
-			<id>vaadin-addons</id>
-			<url>http://maven.vaadin.com/vaadin-addons</url>
-		</repository>
-		<repository>
-			<id>vaadin-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	
-	<dependencyManagement>
-	<dependencies>
-	<dependency>
-	<groupId>com.vaadin</groupId>
-	<artifactId>vaadin-bom</artifactId>
-	<version>${vaadin.version}</version>
-	<scope>import</scope>
-	<type>pom</type>
-	</dependency>
-	
-	</dependencies>
-	</dependencyManagement>
+    <repositories>
+        <repository>
+            <id>vaadin-addons</id>
+            <url>http://maven.vaadin.com/vaadin-addons</url>
+        </repository>
+        <repository>
+            <id>vaadin-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-server</artifactId>
-			<version>${vaadin.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-push</artifactId>
-			<version>${vaadin.version}</version>
-		</dependency>
-		<!--
-		  Needed when using the widgetset optimizer (custom ConnectorBundleLoaderFactory).
-		  
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-bom</artifactId>
+                <version>${vaadin.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-server</artifactId>
+            <version>${vaadin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-push</artifactId>
+            <version>${vaadin.version}</version>
+        </dependency>
+        <!--
+          Needed when using the widgetset optimizer (custom ConnectorBundleLoaderFactory).
+
           For widgetset compilation, vaadin-client-compiler is automatically added on the
           compilation classpath by vaadin-maven-plugin so normally there is no need for an
           explicit dependency.
@@ -75,7 +76,7 @@
             <artifactId>vaadin-themes</artifactId>
             <version>${vaadin.version}</version>
         </dependency>
-                
+
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
@@ -99,7 +100,7 @@
             <version>6.0</version>
             <type>jar</type>
         </dependency>
-        
+
     </dependencies>
 
     <build>
@@ -130,7 +131,8 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <!-- Exclude some unnecessary files generated by the GWT compiler. -->
                     <packagingExcludes>WEB-INF/classes/VAADIN/gwt-unitCache/**,
-                        WEB-INF/classes/VAADIN/widgetsets/WEB-INF/**</packagingExcludes>
+                        WEB-INF/classes/VAADIN/widgetsets/**
+                    </packagingExcludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -189,12 +191,12 @@
                     <scanIntervalSeconds>2</scanIntervalSeconds>
                 </configuration>
             </plugin>
-            
-              <plugin>
+
+            <plugin>
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
                 <version>1.1.0.Alpha1</version>
-       
+
             </plugin>
         </plugins>
 
