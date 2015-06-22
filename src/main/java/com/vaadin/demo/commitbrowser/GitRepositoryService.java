@@ -53,7 +53,7 @@ public class GitRepositoryService {
                 commit.setTimestamp(log1.getAuthorIdent().getWhen());
                 commit.setSize(log1.getRawBuffer().length);
                 commit.setCommitTime(new Date(log1.getCommitTime()));
-                commit.setFullName(commit.getCommitter() + " ("+commit.getEmail()+")");
+                commit.setFullName(commit.getCommitter()/* + " ("+commit.getEmail()+")"*/);
                 StringBuilder fullTopic = new StringBuilder(commit.getMessage().trim());
                 if(fullTopic.length() == 0 ) fullTopic.append("-- No Message -- ");
                 fullTopic.append(" [").append(commit.getId().substring(0, 8)).append(']');
