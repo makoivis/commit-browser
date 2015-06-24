@@ -181,4 +181,11 @@
       border-top: none;
     }
   }
+
+    [class*="spacing"] > tbody > [class*="row"] > td {
+    padding-top: 0;
+  }
+  .v-label-align-value-top {
+    padding-top: 0.5em;
+  }
 }
