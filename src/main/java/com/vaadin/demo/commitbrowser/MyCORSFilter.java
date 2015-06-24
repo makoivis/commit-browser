@@ -31,7 +31,7 @@ import java.io.IOException;
  *
  * @author Vaadin Ltd
  */
-@WebFilter(urlPatterns = "/*")
+//@WebFilter(urlPatterns = "/*")
 public class MyCORSFilter implements Filter {
 
     @Override
