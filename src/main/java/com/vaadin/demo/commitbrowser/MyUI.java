@@ -8,6 +8,7 @@ import java.util.Stack;
 
 import javax.inject.Inject;
 
+import com.vaadin.event.SelectionEvent;
 import com.vaadin.ui.renderers.HtmlRenderer;
 import elemental.json.JsonValue;
 import org.vaadin.viritin.LazyList;
@@ -51,14 +52,13 @@ public class MyUI extends UI {
     @Inject
     GitRepositoryService gitRepositoryService;
     private Grid grid = new Grid();
-    private Stack<Object> openDetails = new Stack<>();
 
     private static LinkedHashMap<String, String> themeVariants = new LinkedHashMap<String, String>();
 
     private static class MinimalSizeHtmlRenderer extends HtmlRenderer {
         @Override
         public JsonValue encode(String value) {
-            return super.encode("<div><div style='width:10px;overflow-x:visible'>" +value + "</div></div>");
+            return super.encode("<div style=';pointer-events: none'><div style='width:10px;overflow-x:visible;pointer-events: none'>" +value + "</div></div>");
         }
     }
 
@@ -239,23 +239,29 @@ public class MyUI extends UI {
                 Object itemId = event.getItemId();
                 boolean isVisible = grid.isDetailsVisible(itemId);
                 grid.setDetailsVisible(itemId, !isVisible);
-                if (!isVisible) {
-                    openDetails.push(itemId);
-                } else {
-                    openDetails.remove(itemId);
-                }
             }
 
         });
         grid.setDetailsGenerator(detailsGenerator);
-
+        grid.addSelectionListener(new SelectionEvent.SelectionListener() {
+            @Override
+            public void select(SelectionEvent selectionEvent) {
+                for (Object id : selectionEvent.getAdded()) {
+                    grid.setDetailsVisible(id, true);
+                }
+                if(selectionEvent.getSelected().isEmpty()) {
+                    for (Object id : selectionEvent.getRemoved()) {
+                        grid.setDetailsVisible(id, false);
+                    }
+                }
+            }
+        });
         layout.addShortcutListener(new ShortcutListener("Close details row",
                 KeyCode.ESCAPE, null) {
             @Override
             public void handleAction(Object sender, Object target) {
                 try {
-                    Object itemId = openDetails.pop();
-                    grid.setDetailsVisible(itemId, false);
+                      grid.setDetailsVisible(grid.getSelectedRow(), false);
                 } catch (Exception ignore) {
                 }
             }
@@ -311,10 +317,14 @@ public class MyUI extends UI {
 
             Label msg = new Label();
             msg.setCaption("Commit Message");
-            msg.setValue(commit.getFullMessage());
             msg.setWidth("100%");
-            msg.setContentMode(ContentMode.PREFORMATTED);
+            msg.setContentMode(ContentMode.HTML);
+            msg.setStyleName("align-value-top");
             layout.addComponent(msg);
+            String text = commit.getFullMessage().replaceAll("(\\n\\r)|(\\n\\r)","\\n");
+            text = text.replaceAll("\\r","\\n");
+            text = text.replaceAll("\\n","<br/>");
+            msg.setValue(text);
 
             return layout;
         }
